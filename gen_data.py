@@ -5,7 +5,7 @@ import re
 from config import Configs
 from shutil import copyfile
 import subprocess
-from fuzzywuzzy import fuzz
+import pathlib
 
 
 def to_str(c):
@@ -81,13 +81,14 @@ def token_mapping2(c, s, tokens): # handle inconsistent tokenizer
 	# match tokens with position in c
 	i = 0
 	t = []
+
 	for token in tokens:		
 		# nltk auto convert (") to (``) and ('') , however ('') token is not changed !!
 		if (token == '``' or token == "''") and not "''" in s[i:i+20]: 
 			token = '"'
 		m = len(token)
-		if token == '':
-			t.append([token, i] + c[i][1:])
+		if token == '':		
+			t.append([token, i] + [0,0])
 			continue
 		while s[i].strip() == '':
 			i += 1
@@ -124,35 +125,25 @@ def tokenize_nltk():
 
 
 def tokenize_vncorenlp(file):
-	character_file = '../data_character/character.pickle'
-	input_file = '../data_vncorenlp/input.txt'
-	output_file = '../data_vncorenlp/output.txt'
-	conll_idx = '../data_vncorenlp/conll_idx'
-	conll_dat = '../data_vncorenlp/conll_dat'
+	if os.path.isfile(file.replace('data', 'data_conll')):
+		print(file)
+		return
 
-	if os.path.isfile(character_file):
-		print('Found pickled character array: ' + character_file)
-		c = pickle.load(open(character_file, 'rb'))
-	else:
-		print('Dumping character array to file: ' + character_file)
-		c = all_raw_to_character()
-		pickle.dump(c, open(character_file, 'wb'))
+	tmp_inp = '../tmp/in'
+	tmp_out = '../tmp/out'
+	c = raw_to_character(file)
+	s = to_str(c)
+	f = open(tmp_inp, 'w')
+	f.write(s)
+	f.close()
+	
+	cmd = 'cd ../VnCoreNLP2/ ;'
+	cmd += '/usr/java/jre1.8.0_161/bin/java -Xmx2g -jar VnCoreNLP-1.0.jar '
+	cmd += '-fin ../tmp/in '
+	cmd += '-fout ../tmp/out -annotators wseg,pos'
+	print(subprocess.check_output(cmd, shell=True))
 
-	if os.path.isfile(output_file):
-		print('Found tokenized data: ' + output_file)
-	else:
-		s = to_str(c)
-		f = open(input_file, 'w')
-		f.write(s)
-		print('VnCoreNLP: tokenizing all data!')
-		cmd = 'cd ../VnCoreNLP2/ ;'
-		cmd += '/usr/java/jre1.8.0_161/bin/java -Xmx2g -jar VnCoreNLP-1.0.jar '
-		cmd += '-fin ../data_vncorenlp/input.txt '
-		cmd += '-fout ../data_vncorenlp/output.txt -annotators wseg,pos'
-		print(subprocess.check_output(cmd, shell=True))
-		print('VnCoreNLP: done tokenizing.')
-
-	f = open(output_file, 'r')
+	f = open(tmp_out, 'r')
 	tokens = []
 	lines = []
 	for line in f:
@@ -164,8 +155,13 @@ def tokenize_vncorenlp(file):
 		tokens.append(lines[-1][1].replace('_', ' '))
 	t = token_mapping2(c, to_str(c), tokens)	
 
-	f_dat = open(conll_dat, 'w')
-	f_idx = open(conll_idx, 'w')
+	file = file.replace('data', 'data_conll')
+	directory = os.path.dirname(file)
+	pathlib.Path(directory).mkdir(parents=True, exist_ok=True)
+
+
+	f_dat = open(file, 'w')
+	f_idx = open(file.replace('muc', 'idx'), 'w')
 	(prev_tag1, prev_tag2) = ('O', 'O')
 	for i in range(len(t)):
 		# print(t[i])
@@ -192,21 +188,62 @@ def tokenize_vncorenlp(file):
 			(prev_tag1, prev_tag2) = ('O', 'O')
 			f_dat.write('\n')
 			f_idx.write('\n')
-	print("Done convert raw data to CONLL format!")
+	f_dat.close()
+	f_idx.close()
+
+# def tokenize_nnvlp(file):
 
 
 def tokenize():
 	files = scan_data()
 	for file in files:
-		print(file)
 		tokenize_vncorenlp(file)
-		
-		
+
+
+def get_data(t, topics):
+	cmd = "find ../data_conll/%s" % t
+	files = str(subprocess.check_output(cmd, shell=True)).split("\\n")
+	dat = ''
+	idx = ''
+	for file in files:
+		for topic in topics:
+			if not topic in file:
+				continue
+			if ".muc" in file:
+				dat += open(file, "r").read()
+			if ".idx" in file:
+				idx += open(file, "r").read()
+			break
+	return dat, idx
+
+
+def group_file_to_topic():
+	topics = ["Doi_song","Giao_duc","Kinh_te","The_gioi",\
+		"Van_hoa","Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]
+	for topic in topics:
+		dat, idx = get_data("Train", [topic])
+		f = open("../data_conll_topic/Train/%s.muc" % topic, "w")
+		f.write(dat)
+		f.close()
+
+		dat, idx = get_data("Dev", [topic])
+		f = open("../data_conll_topic/Dev/%s.muc" % topic, "w")
+		f.write(dat)
+		f.close()
+		# cmd = 'find ../data_conll/Train | grep -E "%s.+muc"' % topic
+		# cmd += ' | xargs cat > ../data_conll_topic/Train/%s.muc' % topic
+		# subprocess.check_output(cmd, shell=True)
+		# subprocess.check_output(cmd.replace("Train", "Dev"), shell=True)
+
 
 
 if __name__ == '__main__':
-	tokenize()
-	# tokenize_vncorenlp()
+	# tokenize()
+	# get_data("Dev", ["Doi_Song"])
+	group_file_to_topic()
+
+
+
 
 
 	
