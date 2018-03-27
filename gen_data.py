@@ -155,7 +155,7 @@ def tokenize_vncorenlp(file):
 		tokens.append(lines[-1][1].replace('_', ' '))
 	t = token_mapping2(c, to_str(c), tokens)	
 
-	file = file.replace('data', 'data_conll')
+	file = file.replace('data', 'data_conll').replace(".txt", ".muc")
 	directory = os.path.dirname(file)
 	pathlib.Path(directory).mkdir(parents=True, exist_ok=True)
 
@@ -218,28 +218,33 @@ def get_data(t, topics):
 
 
 def group_file_to_topic():
-	topics = ["Doi_song","Giao_duc","Kinh_te","The_gioi",\
-		"Van_hoa","Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]
+	# topics = ["Doi_song","Giao_duc","Kinh_te","The_gioi",\
+	# 	"Van_hoa","Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]
+	topics = ["Cong_nghe","Giai_tri","Khoa_hoc","Nha_dat","The_gioi","Van_hoa",\
+	"Doi_song","Giao_duc","Kinh_te","Phap_luat","The_thao","Xa_hoi"]
+
 	for topic in topics:
-		dat, idx = get_data("Train", [topic])
-		f = open("../data_conll_topic/Train/%s.muc" % topic, "w")
+	# 	dat, idx = get_data("Train", [topic])
+	# 	f = open("../data_conll_topic/Train/%s.muc" % topic, "w")
+	# 	f.write(dat)
+	# 	f.close()
+
+	# 	dat, idx = get_data("Dev", [topic])
+	# 	f = open("../data_conll_topic/Dev/%s.muc" % topic, "w")
+	# 	f.write(dat)
+	# 	f.close()
+
+		dat, idx = get_data("Test", [topic])
+		f = open("../data_conll_topic/Test/%s.muc" % topic, "w")
 		f.write(dat)
 		f.close()
 
-		dat, idx = get_data("Dev", [topic])
-		f = open("../data_conll_topic/Dev/%s.muc" % topic, "w")
-		f.write(dat)
-		f.close()
-		# cmd = 'find ../data_conll/Train | grep -E "%s.+muc"' % topic
-		# cmd += ' | xargs cat > ../data_conll_topic/Train/%s.muc' % topic
-		# subprocess.check_output(cmd, shell=True)
-		# subprocess.check_output(cmd.replace("Train", "Dev"), shell=True)
 
 
 
 if __name__ == '__main__':
 	# tokenize()
-	# get_data("Dev", ["Doi_Song"])
+	# get_data("Test", ["Doi_song"])
 	group_file_to_topic()
 
 
