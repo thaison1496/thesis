@@ -80,6 +80,20 @@ def construct_tensor_word(word_sentences):
 		X[i, length:] = np.zeros([1, embedd_dim])
 	return X
 
+# from word to embedding index
+def word_to_index(word_sentences):
+	X = np.full((len(word_sentences), max_length), zero_embedding_pos)
+	for i in range(len(word_sentences)):
+		words = word_sentences[i]
+		length = len(words)
+		for j in range(length):
+			word = words[j].lower()
+			try:
+				embedd_index = embedd_words.index(word)
+			except:
+				embedd_index = unknown_embedd_pos
+			X[i, j] = embedd_index
+	return X
 
 # from str to onehot vector (for pos, chunk, tag)
 def construct_tensor_onehot(feature_sentences, alphabet, dim):
@@ -172,21 +186,78 @@ def str_to_vec():
 
 	return input_train, output_train, input_test, output_test
 
+def str_to_vec2():
+	global input_train, output_train, input_test, output_test, input_train_add, input_test_add
+
+	dim_pos = alphabet_pos.size()
+	dim_tag = alphabet_tag.size()
+
+	train_word_v = word_to_index(train_word)
+	train_pos_v = construct_tensor_onehot(train_pos, alphabet_pos, dim_pos)
+	train_tag_v = construct_tensor_onehot(train_tag, alphabet_tag, dim_tag)
+
+	test_word_v = word_to_index(test_word)
+	test_pos_v = construct_tensor_onehot(test_pos, alphabet_pos, dim_pos)
+	test_tag_v = construct_tensor_onehot(test_tag, alphabet_tag, dim_tag)
+
+	input_train = train_word_v
+	input_train_add = train_pos_v
+	output_train = train_tag_v
+
+	input_test = test_word_v
+	input_test_add = test_pos_v
+	output_test = test_tag_v
+
+
+
+def load_embedding_matrix():
+	global embedd_words
+	global embedd_vectors
+	global unknown_embedd
+	global unknown_embedd_pos
+	global embedd_dim
+	global embedd_matrix
+	global zero_embedding_pos
+
+	word_dir = '../vie-ner-lstm/embedding/words.pl'
+	vector_dir = '../vie-ner-lstm/embedding/vectors.npy'
+	embedd_vectors = np.load(vector_dir)
+	with open(word_dir, 'rb') as handle:
+		embedd_words = pickle.load(handle)
+
+	embedd_dim = np.shape(embedd_vectors)[1]
+	unknown_embedd = np.random.uniform(-0.01, 0.01, [1, embedd_dim])
+	embedd_matrix = np.zeros((len(embedd_words) + 2, embedd_dim))
+
+	for i in range(len(embedd_vectors)):
+		embedd_matrix[i] = embedd_vectors[i]
+
+	embedd_matrix[-2] = unknown_embedd
+	embedd_matrix[-1] = np.zeros((embedd_dim))
+	unknown_embedd_pos = len(embedd_words)
+	zero_embedding_pos = len(embedd_vectors) + 1
+
+	
+# def create_data():
+#	load_embedding()
+# 	load_data()
+# 	str_to_id()
+# 	str_to_vec()
+# 	return input_train, output_train, input_test, output_test, alphabet_tag, embedd_matrix
 
 def create_data():
-	load_embedding()
 	load_data()
+	load_embedding_matrix()
 	str_to_id()
-	str_to_vec()
-	return input_train, output_train, input_test, output_test, alphabet_tag
+	str_to_vec2()
+	return input_train, input_train_add, output_train, input_test, input_test_add, output_test, alphabet_tag, embedd_matrix
 
 if __name__ == "__main__":
-	load_embedding()
-	load_data()
-	str_to_id()
-	str_to_vec()
-	# print(len(train_word))
-	# print(input_train.shape)
-	# print(max_length)
+	load_embedding_matrix()
+	# load_embedding()
+	# load_data()
+	# str_to_id()
+	# str_to_vec()
+	
 	
 
