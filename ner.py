@@ -29,6 +29,10 @@ print('Model summary...')
 print(ner_model.summary())
 print('Training model...')
 
+
+
+exit()
+
 early_stopping = EarlyStopping(patience=patience)
 model_save = ModelCheckpoint('weights.{epoch:02d}-{loss:.2f}.hdf5', save_best_only=True, monitor='loss', mode='min', period=1)
 history = ner_model.fit(input_train, output_train, batch_size=batch_size, epochs=max_epochs,
