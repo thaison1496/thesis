@@ -240,12 +240,40 @@ def group_file_to_topic():
 		f.close()
 
 
+def split_test_data():
+	topics = ["Cong_nghe","Giao_duc","Nha_dat","The_thao","Doi_song","Khoa_hoc","Phap_luat","Van_hoa","Giai_tri","Kinh_te","The_gioi","Xa_hoi"]
+	for topic in topics:
+		num_sent = 0
+		with open("../data_conll_topic/Test/%s.muc" % topic) as f:
+			for line in f:
+				if line.strip() == "":
+					num_sent += 1
+		# tran - val - test: 40 20 40
+		val = round(float(num_sent) * 0.4)
+		test = round(float(num_sent) * 0.6)
+		count = 0
+		print(val)
+		with open("../data_conll_topic/Test/%s.muc" % topic) as f:
+			g = open("../data_conll_topic/Social_Train/%s.muc" % topic, "w")
+			for line in f:
+				g.write(line)
+				if line.strip() == "":
+					count += 1
+					if count == val:
+						print(count)
+						g.close()
+						g = open("../data_conll_topic/Social_Dev/%s.muc" % topic, "w")
+					if count == test:
+						g.close()
+						g = open("../data_conll_topic/Social_Test/%s.muc" % topic, "w")
+			g.close()
 
 
 if __name__ == '__main__':
 	# tokenize()
 	# get_data("Test", ["Doi_song"])
-	group_file_to_topic()
+	# group_file_to_topic()
+	split_test_data()
 
 
 

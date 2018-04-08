@@ -15,38 +15,39 @@ def map_number_and_punct(word):
 
 # output an list of sentences, each sentence is a list of element (word, tag, pos, ...)
 # for example: [['Cau', 'hoi', thu', 'nhat','.'], ['Cau', 'hoi', 'thu', 'hai','.'], ...]
-def read_conll_format(input_file):
-	with codecs.open(input_file, 'r', 'utf-8') as f:
-		word_list = []
-		chunk_list = []
-		pos_list = []
-		tag_list = []
-		words = []
-		chunks = []
-		poss = []
-		tags = []
-		num_sent = 0
-		max_length = 0
-		for line in f:
-			line = line.strip().split("\t")
-			if len(line) > 1:
-				# change all puctions and numbers to <punct> and <num>
-				words.append(map_number_and_punct(line[0].lower()))
-				poss.append(line[1])
-				chunks.append(line[2])
-				tags.append(line[3])
-			else:
-				word_list.append(words)
-				pos_list.append(poss)
-				chunk_list.append(chunks)
-				tag_list.append(tags)
-				sent_length = len(words)
-				words = []
-				chunks = []
-				poss = []
-				tags = []
-				num_sent += 1
-				max_length = max(max_length, sent_length)
+def read_conll_format(input_files):
+	word_list = []
+	chunk_list = []
+	pos_list = []
+	tag_list = []
+	num_sent = 0
+	max_length = 0
+	for input_file in input_files:
+		with codecs.open(input_file, 'r', 'utf-8') as f:
+			words = []
+			chunks = []
+			poss = []
+			tags = []
+			for line in f:
+				line = line.strip().split("\t")
+				if len(line) > 1:
+					# change all puctions and numbers to <punct> and <num>
+					words.append(map_number_and_punct(line[0].lower()))
+					poss.append(line[1])
+					chunks.append(line[2])
+					tags.append(line[3])
+				else:
+					word_list.append(words)
+					pos_list.append(poss)
+					chunk_list.append(chunks)
+					tag_list.append(tags)
+					sent_length = len(words)
+					words = []
+					chunks = []
+					poss = []
+					tags = []
+					num_sent += 1
+					max_length = max(max_length, sent_length)
 	return word_list, pos_list, chunk_list, tag_list, num_sent, max_length
 
 
@@ -123,16 +124,16 @@ def load_embedding():
 	# print(embedd_vectors[:10])
 
 
-def load_data():
+def load_data(train_files, test_files):
 	global train_word, train_pos, train_chunk, train_tag, train_num_sent, train_max_length
 	global test_word, test_pos, test_chunk, test_tag, test_num_sent, test_max_length
 	global max_length
 
 	# hardcode for 1 topic
 	train_word, train_pos, train_chunk, train_tag, train_num_sent, train_max_length = \
-	read_conll_format("../data_conll_topic/Train/The_thao.muc")
+	read_conll_format(train_files)
 	test_word, test_pos, test_chunk, test_tag, test_num_sent, test_max_length = \
-	read_conll_format("../data_conll_topic/Dev/The_thao.muc")
+	read_conll_format(test_files)
 
 	max_length = max(train_max_length, test_max_length)
 
@@ -245,8 +246,8 @@ def load_embedding_matrix():
 # 	str_to_vec()
 # 	return input_train, output_train, input_test, output_test, alphabet_tag, embedd_matrix
 
-def create_data():
-	load_data()
+def create_data(train_files, test_files):
+	load_data(train_files, test_files)
 	load_embedding_matrix()
 	str_to_id()
 	str_to_vec2()
