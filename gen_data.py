@@ -269,11 +269,38 @@ def split_test_data():
 			g.close()
 
 
+def split_train_data():
+	topics = ["Doi_song","Giao_duc","Kinh_te","The_gioi",\
+		"Van_hoa","Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]
+	for topic in topics:
+		num_sent = 0
+		with open("../data_conll_topic/Train/%s.muc" % topic) as f:
+			for line in f:
+				if line.strip() == "":
+					num_sent += 1
+		# tran - val - test: 40 20 40
+		val = round(float(num_sent) * 0.8)
+		count = 0
+		print(val)
+		with open("../data_conll_topic/Train/%s.muc" % topic) as f:
+			g = open("../data_conll_topic/News_Train/%s.muc" % topic, "w")
+			for line in f:
+				g.write(line)
+				if line.strip() == "":
+					count += 1
+					if count == val:
+						print(count)
+						g.close()
+						g = open("../data_conll_topic/News_Dev/%s.muc" % topic, "w")
+			g.close()
+
+
 if __name__ == '__main__':
 	# tokenize()
 	# get_data("Test", ["Doi_song"])
 	# group_file_to_topic()
-	split_test_data()
+	# split_test_data()
+	split_train_data()
 
 
 
