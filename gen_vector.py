@@ -35,6 +35,9 @@ def read_conll_format(input_files):
 					words.append(map_number_and_punct(line[0].lower()))
 					poss.append(line[1])
 					chunks.append(line[2])
+					# ignore MIC
+					if 'MIC' in line[3]:
+						line[3] = 'O'
 					tags.append(line[3])
 				else:
 					word_list.append(words)
@@ -123,12 +126,28 @@ def load_embedding():
 	# print(embedd_words[:10])
 	# print(embedd_vectors[:10])
 
+def get_domain(files):
+	file_names = []
+	file_domains = []
+	for file in files:
+		if type(file) is str:
+			file_names.append(file)
+			file_domains.append(1)
+		else:
+			file_names.append(file[0])
+			file_domains.append(file[1])
+			
 
 def load_data(train_files, dev_files, test_files):
+	global train_domain, dev_domain, test_domain
 	global train_word, train_pos, train_chunk, train_tag, train_num_sent, train_max_length
 	global dev_word, dev_pos, dev_chunk, dev_tag, dev_num_sent, dev_max_length
 	global test_word, test_pos, test_chunk, test_tag, test_num_sent, test_max_length
 	global max_length
+
+	train_files, train_domain = get_domain(train_files)
+	dev_files, dev_domain = get_domain(dev_files)
+	test_files, test_domain = get_domain(test_files)
 
 	train_word, train_pos, train_chunk, train_tag, train_num_sent, train_max_length = \
 	read_conll_format(train_files)

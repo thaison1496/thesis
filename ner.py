@@ -18,7 +18,7 @@ def quick_tf_fix():
 	sess = tf.Session(config = config)
 
 
-def run(train_files, dev_files, test_files, max_epochs, no_val=False):
+def run(train_files, dev_files, test_files, max_epochs, no_val=False, name=""):
 	# quick_tf_fix()
 	num_lstm_layer = 2
 	num_hidden_node = 64
@@ -45,7 +45,7 @@ def run(train_files, dev_files, test_files, max_epochs, no_val=False):
 	print('Training model...')
 
 	early_stopping = EarlyStopping(patience=patience)
-	model_save = ModelCheckpoint('models/weights.{epoch:02d}-{loss:.2f}.hdf5', save_best_only=True, monitor='loss', mode='min', period=1)
+	model_save = ModelCheckpoint('models/weights.{epoch:02d}-{loss:.2f}.hdf5', save_best_only=True, monitor='loss', mode='min', period=50)
 	if no_val:
 		history = ner_model.fit({"word_index": input_train, "additional_feature": input_train_add}, output_train, batch_size=batch_size, epochs=max_epochs)
 	else:
@@ -53,7 +53,7 @@ def run(train_files, dev_files, test_files, max_epochs, no_val=False):
 	                         callbacks=[early_stopping],
 	                         validation_data=({"word_index": input_dev, "additional_feature": input_dev_add}, output_dev))
 
-	ner_model.save_weights("models/weights.hdf5")
+	ner_model.save_weights("models/%s.weights.hdf5" % name)
 
 
 	print('Testing model...')

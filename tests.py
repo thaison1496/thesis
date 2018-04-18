@@ -1,4 +1,5 @@
 import ner
+import sys
 
 # with every pair of topic, run maxent model with 1 topic as train and the other as test
 def ner_topic_pair_test():
@@ -92,7 +93,103 @@ def news_1_no_val():
 	ner.run(train_files, dev_files, test_files, 50, no_val=True)
 
 
+# 2449/2449 [==============================] - 20s 8ms/step - loss: 0.0292 - acc: 0.9907 - val_loss: 0.0176 - val_acc: 0.9952
+# Testing model...
+# ['B-PER', 'O', 'B-LOC', 'B-ORG', 'I-ORG', 'I-PER', 'B-MIC', 'I-MIC', 'I-LOC']
+# (817, 136)
+# processed 21900 tokens with 975 phrases; found: 890 phrases; correct: 665.
+# accuracy:  97.79%; precision:  74.72%; recall:  68.21%; FB1:  71.31
+#               LOC: precision:  83.16%; recall:  77.07%; FB1:  80.00  291
+#               MIC: precision:   0.00%; recall:   0.00%; FB1:   0.00  28
+#               ORG: precision:  72.46%; recall:  60.45%; FB1:  65.91  443
+#               PER: precision:  79.69%; recall:  78.46%; FB1:  79.07  128
+# Running time: 
+# 0:16:07.684321
+def kinh_te():
+	train_files = ["../folds/fold_1/Kinh_te.train"]
+	dev_files = ["../folds/fold_1/Kinh_te.dev"]
+	test_files = ["../folds/fold_1/Kinh_te.test"]
+	ner.run(train_files, dev_files, test_files, 50)
+
+
+# Epoch 135/500
+# 2449/2449 [==============================] - 20s 8ms/step - loss: 0.0068 - acc: 0.9978 - val_loss: 0.0018 - val_acc: 0.9995
+# processed 21900 tokens with 938 phrases; found: 890 phrases; correct: 680.
+# accuracy:  97.93%; precision:  76.40%; recall:  72.49%; FB1:  74.40
+#               LOC: precision:  84.88%; recall:  76.00%; FB1:  80.19  291
+#               MIC: precision:   3.57%; recall:  25.00%; FB1:   6.25  28
+#               ORG: precision:  73.36%; recall:  68.13%; FB1:  70.65  443
+#               PER: precision:  83.59%; recall:  81.06%; FB1:  82.31  128
+# Testing model...
+# ['B-PER', 'O', 'B-LOC', 'B-ORG', 'I-ORG', 'I-PER', 'B-MIC', 'I-MIC', 'I-LOC']
+# (817, 136)
+# Running time: 
+# 0:49:24.697321
+def kinh_te2():
+	train_files = ["../folds/fold_1/Kinh_te.train"]
+	dev_files = ["../folds/fold_1/Kinh_te.dev"]
+	test_files = ["../folds/fold_1/Kinh_te.test"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+# Epoch 125/500
+# 2449/2449 [==============================] - 19s 8ms/step - loss: 0.0075 - acc: 0.9978 - val_loss: 0.0024 - val_acc: 0.9993
+# processed 21900 tokens with 963 phrases; found: 862 phrases; correct: 696.
+# accuracy:  98.21%; precision:  80.74%; recall:  72.27%; FB1:  76.27
+#               LOC: precision:  84.88%; recall:  75.54%; FB1:  79.94  291
+#               ORG: precision:  77.20%; recall:  67.06%; FB1:  71.77  443
+#               PER: precision:  83.59%; recall:  84.92%; FB1:  84.25  128
+
+def kinh_te_no_mic():
+	train_files = ["../folds/fold_1/Kinh_te.train"]
+	dev_files = ["../folds/fold_1/Kinh_te.dev"]
+	test_files = ["../folds/fold_1/Kinh_te.test"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+# Epoch 135/500
+# 2449/2449 [==============================] - 41s 17ms/step - loss: 0.0059 - acc: 0.9980 - val_loss: 9.2868e-04 - val_acc: 0.9998
+# processed 21900 tokens with 946 phrases; found: 862 phrases; correct: 718.
+# accuracy:  98.31%; precision:  83.29%; recall:  75.90%; FB1:  79.42
+#               LOC: precision:  88.32%; recall:  80.06%; FB1:  83.99  291
+#               ORG: precision:  79.23%; recall:  68.96%; FB1:  73.74  443
+#               PER: precision:  85.94%; recall:  94.83%; FB1:  90.16  128
+# Testing model...
+# ['B-PER', 'O', 'B-LOC', 'B-ORG', 'I-ORG', 'I-PER', 'I-LOC']
+# (817, 136)
+# Running time: 
+# 1:40:16.656015
+
+# real	100m19.794s
+# user	159m47.853s
+# sys	7m3.040s
+def kinh_te_2_lstm():
+	train_files = ["../folds/fold_1/Kinh_te.train"]
+	dev_files = ["../folds/fold_1/Kinh_te.dev"]
+	test_files = ["../folds/fold_1/Kinh_te.test"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def topic_2_lstm(topic):
+	train_files = ["../folds/fold_1/%s.train" % topic]
+	dev_files = ["../folds/fold_1/%s.dev" % topic]
+	test_files = ["../folds/fold_1/%s.test" % topic]
+	ner.run(train_files, dev_files, test_files, 500, name=topic)
+
+
+def kinhte_thethao():
+	train_files = [("../folds/fold_1/Kinh_te.train", 1),
+		("../folds/fold_1/The_thao.train", 0)]
+	dev_files = [("../folds/fold_1/Kinh_te.dev", 1)]
+	test_files = [("../folds/fold_1/Kinh_te.test", 1)]
+	ner.run(train_files, dev_files, test_files, 500)
+
 if __name__ == "__main__":
 	# ner_topic_pair_test()
 	# news_1()
-	news_1_no_val()
+	# news_1_no_val()
+	# kinh_te2()
+	# kinh_te_no_mic()
+	# kinh_te_2_lstm()
+	topic_2_lstm(sys.argv[1].strip())
+	# topic_2_lstm(sys.argv[1])

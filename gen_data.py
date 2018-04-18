@@ -295,12 +295,90 @@ def split_train_data():
 			g.close()
 
 
+def unify_train_data():
+	topics = ["Doi_song","Giao_duc","Kinh_te","The_gioi",\
+		"Van_hoa","Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]
+	for topic in topics:
+		g = open("../data_iob2/All/%s.muc" % topic, "w")
+		with open("../data_iob2/Train/%s.muc" % topic) as f:
+			for line in f:
+				g.write(line)
+		with open("../data_iob2/Dev/%s.muc" % topic) as f:
+			for line in f:
+				g.write(line)
+		with open("../data_iob2/Test/%s.muc" % topic) as f:
+			for line in f:
+				g.write(line)
+		g.close()
+
+
+def shuffle():
+	import random
+	topics = ["Doi_song","Giao_duc","Kinh_te","The_gioi",\
+		"Van_hoa","Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]
+
+	for topic in topics:
+		sents = [""]
+		with open("../data_iob2/All/%s.muc" % topic) as f:
+			for line in f:
+				sents[-1] += line
+				if line.strip() == "":
+					sents.append("")
+		random.shuffle(sents)
+		with open("../data_iob2/All_shuffle/%s.muc" % topic, "w") as f:
+			for sent in sents:
+				f.write(sent)
+			
+
+# k = 1..5
+def gen_fold(k):
+	subprocess.check_output("mkdir -p ../folds/fold_%d" % k, shell=True)
+	topics = ["Doi_song","Giao_duc","Kinh_te","The_gioi",\
+		"Van_hoa","Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]
+
+	for topic in topics:
+		sents = [""]
+		n = 0
+		with open("../data_iob2/All/%s.muc" % topic) as f:
+			for line in f:
+				sents[-1] += line
+				if line.strip() == "":
+					n += 1
+					sents.append("")
+		t = round(n/5)
+		if k != 5:
+			trains = sents[:t*(k-1)] + sents[t*(k+1):]
+		else:
+			trains = sents[t:t*(k-1)]
+		if k != 5:
+			devs = sents[t*k:t*(k+1)]
+		else:
+			devs = sents[:t]
+		tests = sents[t*(k-1):t*k]
+
+		with open("../folds/fold_%d/%s.train" % (k, topic), "w") as f:
+			for sent in trains:
+				f.write(sent)
+		with open("../folds/fold_%d/%s.dev" % (k, topic), "w") as f:
+			for sent in devs:
+				f.write(sent)
+		with open("../folds/fold_%d/%s.test" % (k, topic), "w") as f:
+			for sent in tests:
+				f.write(sent)
+
+
+
+
 if __name__ == '__main__':
 	# tokenize()
 	# get_data("Test", ["Doi_song"])
 	# group_file_to_topic()
 	# split_test_data()
-	split_train_data()
+	# split_train_data()
+	# unify_train_data()
+	# shuffle()
+	for i in range(5):
+		gen_fold(i + 1)
 
 
 
