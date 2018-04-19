@@ -15,14 +15,25 @@ def map_number_and_punct(word):
 
 # output an list of sentences, each sentence is a list of element (word, tag, pos, ...)
 # for example: [['Cau', 'hoi', thu', 'nhat','.'], ['Cau', 'hoi', 'thu', 'hai','.'], ...]
+
+# 0 source
+# 1 target
+# 2 all
 def read_conll_format(input_files):
 	word_list = []
 	chunk_list = []
 	pos_list = []
 	tag_list = []
+	domain_list = []
 	num_sent = 0
 	max_length = 0
 	for input_file in input_files:
+		if type(input_file) is str:
+			domain = 2
+		else:
+			domain = input_file[1]
+			input_file = input_file[0]
+
 		with codecs.open(input_file, 'r', 'utf-8') as f:
 			words = []
 			chunks = []
@@ -40,6 +51,7 @@ def read_conll_format(input_files):
 						line[3] = 'O'
 					tags.append(line[3])
 				else:
+					domain_list.append(domain)
 					word_list.append(words)
 					pos_list.append(poss)
 					chunk_list.append(chunks)
@@ -51,7 +63,7 @@ def read_conll_format(input_files):
 					tags = []
 					num_sent += 1
 					max_length = max(max_length, sent_length)
-	return word_list, pos_list, chunk_list, tag_list, num_sent, max_length
+	return word_list, pos_list, chunk_list, tag_list, num_sent, max_length, domain_list
 
 
 # map each value to an unique id, for example: Np -> 1, N -> 2, ...
@@ -126,17 +138,7 @@ def load_embedding():
 	# print(embedd_words[:10])
 	# print(embedd_vectors[:10])
 
-def get_domain(files):
-	file_names = []
-	file_domains = []
-	for file in files:
-		if type(file) is str:
-			file_names.append(file)
-			file_domains.append(1)
-		else:
-			file_names.append(file[0])
-			file_domains.append(file[1])
-			
+
 
 def load_data(train_files, dev_files, test_files):
 	global train_domain, dev_domain, test_domain
@@ -145,17 +147,13 @@ def load_data(train_files, dev_files, test_files):
 	global test_word, test_pos, test_chunk, test_tag, test_num_sent, test_max_length
 	global max_length
 
-	train_files, train_domain = get_domain(train_files)
-	dev_files, dev_domain = get_domain(dev_files)
-	test_files, test_domain = get_domain(test_files)
-
-	train_word, train_pos, train_chunk, train_tag, train_num_sent, train_max_length = \
+	train_word, train_pos, train_chunk, train_tag, train_num_sent, train_max_length, train_domain = \
 	read_conll_format(train_files)
 
-	dev_word, dev_pos, dev_chunk, dev_tag, dev_num_sent, dev_max_length = \
-	read_conll_format(train_files)\
+	dev_word, dev_pos, dev_chunk, dev_tag, dev_num_sent, dev_max_length, dev_domain = \
+	read_conll_format(dev_files)\
 
-	test_word, test_pos, test_chunk, test_tag, test_num_sent, test_max_length = \
+	test_word, test_pos, test_chunk, test_tag, test_num_sent, test_max_length, test_domain = \
 	read_conll_format(test_files)
 
 	max_length = max(train_max_length, test_max_length, dev_max_length)
@@ -223,8 +221,36 @@ def str_to_id():
 
 # 	return input_train, output_train, input_test, output_test
 
+def create_domain_vec(sents, domains):
+	# return []
+	res = np.zeros([len(sents), max_length, 128], dtype=float)
+	for i, sent in enumerate(sents):
+		for j, word in enumerate(sent):
+			for k in range(128):
+				res[i][j][k] = mask[domains[i]][k]
+	return res
+
+
+def gen_mask():
+	global mask
+	src_mask = [0 for i in range(128)]
+	for i in range(96):
+		src_mask[i] = 1.0
+	target_mask = [0 for i in range(128)]
+	for i in range(128):
+		target_mask[i] = 1.0
+	for i in range(96, 128):
+		target_mask[i] = 1
+	all_mark = [1.0 for i in range(128)]
+	mask = [src_mask, target_mask, all_mark]
+	# print(mask)
+
+
 def str_to_vec2():
 	global input_train, output_train, input_test, output_test, input_train_add, input_test_add, input_dev, input_dev_add, output_dev
+	global train_domain_v, dev_domain_v, test_domain_v
+	global mask
+	global train_domain_v, dev_domain_v, test_domain_v
 
 	dim_pos = alphabet_pos.size()
 	dim_tag = alphabet_tag.size()
@@ -232,14 +258,17 @@ def str_to_vec2():
 	train_word_v = word_to_index(train_word)
 	train_pos_v = construct_tensor_onehot(train_pos, alphabet_pos, dim_pos)
 	train_tag_v = construct_tensor_onehot(train_tag, alphabet_tag, dim_tag)
+	train_domain_v = create_domain_vec(train_word, train_domain)
 
 	dev_word_v = word_to_index(dev_word)
 	dev_pos_v = construct_tensor_onehot(dev_pos, alphabet_pos, dim_pos)
 	dev_tag_v = construct_tensor_onehot(dev_tag, alphabet_tag, dim_tag)
+	dev_domain_v = create_domain_vec(dev_word, dev_domain)
 
 	test_word_v = word_to_index(test_word)
 	test_pos_v = construct_tensor_onehot(test_pos, alphabet_pos, dim_pos)
 	test_tag_v = construct_tensor_onehot(test_tag, alphabet_tag, dim_tag)
+	test_domain_v = create_domain_vec(test_word, test_domain)
 
 	input_train = train_word_v
 	input_train_add = train_pos_v
@@ -282,7 +311,8 @@ def load_embedding_matrix():
 	unknown_embedd_pos = len(embedd_words)
 	zero_embedding_pos = len(embedd_vectors) + 1
 
-	
+
+
 # def create_data():
 #	load_embedding()
 # 	load_data()
@@ -291,18 +321,23 @@ def load_embedding_matrix():
 # 	return input_train, output_train, input_test, output_test, alphabet_tag, embedd_matrix
 
 def create_data(train_files, dev_files, test_files):
+	gen_mask()
 	load_data(train_files, dev_files, test_files)
 	load_embedding_matrix()
 	str_to_id()
 	str_to_vec2()
-	return input_train, input_train_add, input_dev, input_dev_add, input_test, input_test_add, output_train, output_dev, output_test, alphabet_tag, embedd_matrix
+	return input_train, input_train_add, input_dev, input_dev_add, \
+		input_test, input_test_add, output_train, output_dev, output_test, \
+		alphabet_tag, embedd_matrix, train_domain_v, dev_domain_v, test_domain_v
 
 if __name__ == "__main__":
-	load_embedding_matrix()
+	pass
+	# load_embedding_matrix()
 	# load_embedding()
 	# load_data()
 	# str_to_id()
 	# str_to_vec()
+
 	
 	
 

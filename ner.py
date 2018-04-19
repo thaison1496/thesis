@@ -29,8 +29,22 @@ def run(train_files, dev_files, test_files, max_epochs, no_val=False, name=""):
 	startTime = datetime.now()
 
 	print('Loading data...')
-	input_train, input_train_add, input_dev, input_dev_add, input_test, input_test_add, output_train, output_dev, output_test, alphabet_tag, embedd_matrix \
+	input_train, input_train_add, input_dev, input_dev_add, \
+	input_test, input_test_add, output_train, output_dev, output_test, \
+	alphabet_tag, embedd_matrix, \
+	train_domain, dev_domain, test_domain \
 	= gen_vector.create_data(train_files, dev_files, test_files)
+
+	# print(train_domain.shape)
+	# print(train_domain[0][0])
+	# print(train_domain[-1][0])
+	# print(input_train.shape)
+	# print(input_dev.shape)
+	# print(input_test.shape)
+	# print(train_domain.shape)
+	# print(dev_domain.shape)
+
+	# exit()
 	print('Building model...')
 
 	time_step = np.shape(input_train)[1]
@@ -38,7 +52,7 @@ def run(train_files, dev_files, test_files, max_epochs, no_val=False, name=""):
 	output_length = np.shape(output_train)[2]
 
 
-	ner_model = networks.building_ner2(num_lstm_layer, num_hidden_node, \
+	ner_model = networks.building_ner3(num_lstm_layer, num_hidden_node, \
 		dropout, time_step, embedd_size, output_length, embedd_matrix, input_train_add.shape[-1])
 	print('Model summary...')
 	print(ner_model.summary())
@@ -46,19 +60,30 @@ def run(train_files, dev_files, test_files, max_epochs, no_val=False, name=""):
 
 	early_stopping = EarlyStopping(patience=patience)
 	model_save = ModelCheckpoint('models/weights.{epoch:02d}-{loss:.2f}.hdf5', save_best_only=True, monitor='loss', mode='min', period=50)
-	if no_val:
-		history = ner_model.fit({"word_index": input_train, "additional_feature": input_train_add}, output_train, batch_size=batch_size, epochs=max_epochs)
-	else:
-		history = ner_model.fit({"word_index": input_train, "additional_feature": input_train_add}, output_train, batch_size=batch_size, epochs=max_epochs,
-	                         callbacks=[early_stopping],
-	                         validation_data=({"word_index": input_dev, "additional_feature": input_dev_add}, output_dev))
+	# if no_val:
+	# 	history = ner_model.fit({"word_index": input_train, "additional_feature": input_train_add}, output_train, batch_size=batch_size, epochs=max_epochs)
+	# else:
+	# 	history = ner_model.fit({"word_index": input_train, "additional_feature": input_train_add}, output_train, batch_size=batch_size, epochs=max_epochs,
+	#                          callbacks=[early_stopping],
+	#                          validation_data=({"word_index": input_dev, "additional_feature": input_dev_add}, output_dev))
+
+	history = ner_model.fit({"word_index": input_train, 
+						"additional_feature": input_train_add,
+						"domain_mask": train_domain
+						}, output_train, batch_size=batch_size, epochs=max_epochs,
+                     callbacks=[early_stopping],
+                     validation_data=({"word_index": input_dev, 
+                     	"additional_feature": input_dev_add,
+                     	"domain_mask": dev_domain}, output_dev))
 
 	ner_model.save_weights("models/%s.weights.hdf5" % name)
 
 
 	print('Testing model...')
 
-	answer = ner_model.predict({"word_index": input_test, "additional_feature": input_test_add}, batch_size=batch_size).argmax(axis=-1)
+	answer = ner_model.predict({"word_index": input_test, 
+					"additional_feature": input_test_add,
+					"domain_mask": test_domain}, batch_size=batch_size).argmax(axis=-1)
 	utils.predict_to_file(answer, output_test, alphabet_tag, 'out.txt')
 	input = open('out.txt')
 	p1 = subprocess.Popen(shlex.split("perl conlleval.pl"), stdin=input)

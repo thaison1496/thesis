@@ -177,13 +177,97 @@ def topic_2_lstm(topic):
 	ner.run(train_files, dev_files, test_files, 500, name=topic)
 
 
-def kinhte_thethao():
+# test transfer model correctness
+def kinh_te_transfer_model():
+	train_files = ["../folds/fold_1/Kinh_te.train"]
+	dev_files = ["../folds/fold_1/Kinh_te.dev"]
+	test_files = ["../folds/fold_1/Kinh_te.test"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def kinhte_thethao_outdomain():
+	train_files = ["../folds/fold_1/Kinh_te.train"]
+	dev_files = ["../folds/fold_1/The_thao.dev"]
+	test_files = ["../folds/fold_1/The_thao.test"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def kinhte_thethao_mix():
+	train_files = ["../folds/fold_1/The_thao.train",
+		"../folds/fold_1/Kinh_te.train",
+		"../folds/fold_1/Kinh_te.dev",
+		"../folds/fold_1/Kinh_te.test"]
+	dev_files = ["../folds/fold_1/The_thao.dev"]
+	test_files = ["../folds/fold_1/The_thao.test"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def kinhte_thethao_transfer():
+	train_files = [("../folds/fold_1/The_thao.train", 1),
+		("../folds/fold_1/Kinh_te.train", 0),
+		("../folds/fold_1/Kinh_te.dev", 0),
+		("../folds/fold_1/Kinh_te.test", 0)]
+	dev_files = [("../folds/fold_1/The_thao.dev", 1)]
+	test_files = [("../folds/fold_1/The_thao.test", 1)]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def thethao_kinhte_outdomain():
+	train_files = ["../folds/fold_1/The_thao.train"]
+	dev_files = ["../folds/fold_1/Kinh_te.dev"]
+	test_files = ["../folds/fold_1/Kinh_te.test"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def thethao_kinhte_mix():
+	train_files = ["../folds/fold_1/Kinh_te.train",
+		"../folds/fold_1/The_thao.train",
+		"../folds/fold_1/The_thao.dev",
+		"../folds/fold_1/The_thao.test"]
+	dev_files = ["../folds/fold_1/Kinh_te.dev"]
+	test_files = ["../folds/fold_1/Kinh_te.test"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def thethao_kinhte_transfer():
+	print("thethao_kinhte_transfer")
 	train_files = [("../folds/fold_1/Kinh_te.train", 1),
-		("../folds/fold_1/The_thao.train", 0)]
+		("../folds/fold_1/The_thao.train", 0),
+		("../folds/fold_1/The_thao.dev", 0),
+		("../folds/fold_1/The_thao.test", 0)]
 	dev_files = [("../folds/fold_1/Kinh_te.dev", 1)]
 	test_files = [("../folds/fold_1/Kinh_te.test", 1)]
 	ner.run(train_files, dev_files, test_files, 500)
 
+
+def kinhte_no_shuffle():
+	# topics = ["Doi_song","Giao_duc","Kinh_te","The_gioi",\
+	# 	"Van_hoa","Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]
+	topics = ["Kinh_te"]
+	train_files = []
+	dev_files = []
+	test_files = []
+	for topic in topics:
+		train_files.append("../data_conll_topic/News_Train/%s.muc" % topic)
+		dev_files.append("../data_conll_topic/News_Dev/%s.muc" % topic)
+		test_files.append("../data_conll_topic/News_Test/%s.muc" % topic)
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def all_mix():
+	print("all_mix")
+	train_files = []
+	dev_files = []
+	test_files = []
+	topics = ["Doi_song","Giao_duc","Kinh_te","The_gioi",\
+		"Van_hoa","Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]
+	for topic in topics:
+		train_files.append("../folds/fold_1/%s.train" % topic)
+		dev_files.append("../folds/fold_1/%s.dev" % topic)
+		test_files.append("../folds/fold_1/%s.test" % topic)
+	ner.run(train_files, dev_files, test_files, 500)
+
+	
 if __name__ == "__main__":
 	# ner_topic_pair_test()
 	# news_1()
@@ -191,5 +275,15 @@ if __name__ == "__main__":
 	# kinh_te2()
 	# kinh_te_no_mic()
 	# kinh_te_2_lstm()
-	topic_2_lstm(sys.argv[1].strip())
+	# topic_2_lstm(sys.argv[1].strip())
 	# topic_2_lstm(sys.argv[1])
+	# kinhte_thethao()
+	# kinhte_thethao_outdomain()
+	# kinhte_thethao_mix()
+	# kinhte_thethao_transfer()
+	# kinhte_no_shuffle()
+	# thethao_kinhte_outdomain()
+	# thethao_kinhte_mix()
+	# all_mix()
+	thethao_kinhte_transfer()
+	

@@ -57,11 +57,11 @@ def building_ner3(num_lstm_layer, num_hidden_node, dropout, \
                                  recurrent_dropout=dropout))(concat)
     lstm2 = Bidirectional(LSTM(units=num_hidden_node, return_sequences=True, dropout=dropout,
                                  recurrent_dropout=dropout))(lstm)
-    inp_mask = Input(batch_shape=(None, time_step, num_hidden_node), name="domain_mask")(lstm2)
+    inp_mask = Input(batch_shape=(None, time_step, num_hidden_node * 2), name="domain_mask")
     filtered = Multiply()([lstm2, inp_mask])
     dense = TimeDistributed(Dense(output_lenght))(filtered)
     activation = Activation('softmax')(dense)
-    model = Model(input=[inp, inp_add], output=activation)
+    model = Model(input=[inp, inp_add, inp_mask], output=activation)
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     return model
 
