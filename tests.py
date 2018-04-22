@@ -170,6 +170,14 @@ def kinh_te_2_lstm():
 	ner.run(train_files, dev_files, test_files, 500)
 
 
+def thethao_2_lstm():
+	print("thethao_2_lstm")
+	train_files = ["../folds/fold_1/Kinh_te.train"]
+	dev_files = ["../folds/fold_1/Kinh_te.dev"]
+	test_files = ["../folds/fold_1/Kinh_te.test"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
 def topic_2_lstm(topic):
 	train_files = ["../folds/fold_1/%s.train" % topic]
 	dev_files = ["../folds/fold_1/%s.dev" % topic]
@@ -193,6 +201,7 @@ def kinhte_thethao_outdomain():
 
 
 def kinhte_thethao_mix():
+	print("kinhte_thethao_mix_2")
 	train_files = ["../folds/fold_1/The_thao.train",
 		"../folds/fold_1/Kinh_te.train",
 		"../folds/fold_1/Kinh_te.dev",
@@ -254,6 +263,34 @@ def kinhte_no_shuffle():
 	ner.run(train_files, dev_files, test_files, 500)
 
 
+def thethao_no_shuffle():
+	# topics = ["Doi_song","Giao_duc","Kinh_te","The_gioi",\
+	# 	"Van_hoa","Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]
+	topics = ["The_thao"]
+	train_files = []
+	dev_files = []
+	test_files = []
+	for topic in topics:
+		train_files.append("../data_conll_topic/News_Train/%s.muc" % topic)
+		dev_files.append("../data_conll_topic/News_Dev/%s.muc" % topic)
+		test_files.append("../data_conll_topic/News_Test/%s.muc" % topic)
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def topic_no_shuffle(topic):
+	# topics = ["Doi_song","Giao_duc","Kinh_te","The_gioi",\
+	# 	"Van_hoa","Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]
+	print(topic)
+	train_files = []
+	dev_files = []
+	test_files = []
+	
+	train_files.append("../data_conll_topic/News_Train/%s.muc" % topic)
+	dev_files.append("../data_conll_topic/News_Dev/%s.muc" % topic)
+	test_files.append("../data_conll_topic/News_Test/%s.muc" % topic)
+	ner.run(train_files, dev_files, test_files, 500)
+
+
 def all_mix():
 	print("all_mix")
 	train_files = []
@@ -267,7 +304,8 @@ def all_mix():
 		test_files.append("../folds/fold_1/%s.test" % topic)
 	ner.run(train_files, dev_files, test_files, 500)
 
-	
+
+
 if __name__ == "__main__":
 	# ner_topic_pair_test()
 	# news_1()
@@ -275,6 +313,7 @@ if __name__ == "__main__":
 	# kinh_te2()
 	# kinh_te_no_mic()
 	# kinh_te_2_lstm()
+	# thethao_2_lstm()
 	# topic_2_lstm(sys.argv[1].strip())
 	# topic_2_lstm(sys.argv[1])
 	# kinhte_thethao()
@@ -285,5 +324,6 @@ if __name__ == "__main__":
 	# thethao_kinhte_outdomain()
 	# thethao_kinhte_mix()
 	# all_mix()
-	thethao_kinhte_transfer()
-	
+	# thethao_kinhte_transfer()
+	# thethao_no_shuffle()
+	topic_no_shuffle(sys.argv[1].strip())

@@ -23,8 +23,8 @@ def run(train_files, dev_files, test_files, max_epochs, no_val=False, name=""):
 	num_lstm_layer = 2
 	num_hidden_node = 64
 	dropout = 0.5
-	batch_size = 50
-	patience = 5
+	batch_size = 128
+	patience = 10
 
 	startTime = datetime.now()
 
@@ -59,7 +59,7 @@ def run(train_files, dev_files, test_files, max_epochs, no_val=False, name=""):
 	print('Training model...')
 
 	early_stopping = EarlyStopping(patience=patience)
-	model_save = ModelCheckpoint('models/weights.{epoch:02d}-{loss:.2f}.hdf5', save_best_only=True, monitor='loss', mode='min', period=50)
+	model_save = ModelCheckpoint('models/weights.{epoch:02d}-{loss:.2f}.hdf5', save_best_only=True, monitor='loss', mode='min', period=20)
 	# if no_val:
 	# 	history = ner_model.fit({"word_index": input_train, "additional_feature": input_train_add}, output_train, batch_size=batch_size, epochs=max_epochs)
 	# else:
@@ -71,7 +71,7 @@ def run(train_files, dev_files, test_files, max_epochs, no_val=False, name=""):
 						"additional_feature": input_train_add,
 						"domain_mask": train_domain
 						}, output_train, batch_size=batch_size, epochs=max_epochs,
-                     callbacks=[early_stopping],
+                     callbacks=[early_stopping, model_save],
                      validation_data=({"word_index": input_dev, 
                      	"additional_feature": input_dev_add,
                      	"domain_mask": dev_domain}, output_dev))
