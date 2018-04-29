@@ -18,7 +18,7 @@ def quick_tf_fix():
 	sess = tf.Session(config = config)
 
 
-def run(train_files, dev_files, test_files, max_epochs, no_val=False, name=""):
+def run(train_files, dev_files, test_files, max_epochs, no_val=False, name="", weigth=0.0, in_domain=10000):
 	# quick_tf_fix()
 	num_lstm_layer = 2
 	num_hidden_node = 64
@@ -33,7 +33,7 @@ def run(train_files, dev_files, test_files, max_epochs, no_val=False, name=""):
 	input_test, input_test_add, output_train, output_dev, output_test, \
 	alphabet_tag, embedd_matrix, \
 	train_domain, dev_domain, test_domain \
-	= gen_vector.create_data(train_files, dev_files, test_files)
+	= gen_vector.create_data(train_files, dev_files, test_files, weigth, in_domain)
 
 	# print(train_domain.shape)
 	# print(train_domain[0][0])
@@ -71,7 +71,7 @@ def run(train_files, dev_files, test_files, max_epochs, no_val=False, name=""):
 						"additional_feature": input_train_add,
 						"domain_mask": train_domain
 						}, output_train, batch_size=batch_size, epochs=max_epochs,
-                     callbacks=[early_stopping, model_save],
+                     callbacks=[early_stopping],
                      validation_data=({"word_index": input_dev, 
                      	"additional_feature": input_dev_add,
                      	"domain_mask": dev_domain}, output_dev))

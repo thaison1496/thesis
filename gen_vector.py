@@ -19,7 +19,11 @@ def map_number_and_punct(word):
 # 0 source
 # 1 target
 # 2 all
-def read_conll_format(input_files):
+
+# train kinhte: 1535
+# train vanhoa: 1755
+def read_conll_format(input_files, in_domain=100000):
+	# print(in_domain)
 	word_list = []
 	chunk_list = []
 	pos_list = []
@@ -28,6 +32,7 @@ def read_conll_format(input_files):
 	num_sent = 0
 	max_length = 0
 	for input_file in input_files:
+		# print(input_file)
 		if type(input_file) is str:
 			domain = 2
 		else:
@@ -40,8 +45,9 @@ def read_conll_format(input_files):
 			poss = []
 			tags = []
 			for line in f:
+				# print(line)
 				line = line.strip().split("\t")
-				if len(line) > 1:
+				if (len(line) > 1) and len(words) < 200:
 					# change all puctions and numbers to <punct> and <num>
 					words.append(map_number_and_punct(line[0].lower()))
 					poss.append(line[1])
@@ -51,6 +57,11 @@ def read_conll_format(input_files):
 						line[3] = 'O'
 					tags.append(line[3])
 				else:
+					if ("Kinh_te" in input_file) and (250 * in_domain + 1755 < num_sent):
+						print(num_sent)
+						break
+					# print(len(words))
+					# print(words)
 					domain_list.append(domain)
 					word_list.append(words)
 					pos_list.append(poss)
@@ -63,6 +74,7 @@ def read_conll_format(input_files):
 					tags = []
 					num_sent += 1
 					max_length = max(max_length, sent_length)
+
 	return word_list, pos_list, chunk_list, tag_list, num_sent, max_length, domain_list
 
 
@@ -140,7 +152,7 @@ def load_embedding():
 
 
 
-def load_data(train_files, dev_files, test_files):
+def load_data(train_files, dev_files, test_files, in_domain):
 	global train_domain, dev_domain, test_domain
 	global train_word, train_pos, train_chunk, train_tag, train_num_sent, train_max_length
 	global dev_word, dev_pos, dev_chunk, dev_tag, dev_num_sent, dev_max_length
@@ -148,7 +160,7 @@ def load_data(train_files, dev_files, test_files):
 	global max_length
 
 	train_word, train_pos, train_chunk, train_tag, train_num_sent, train_max_length, train_domain = \
-	read_conll_format(train_files)
+	read_conll_format(train_files, in_domain)
 
 	dev_word, dev_pos, dev_chunk, dev_tag, dev_num_sent, dev_max_length, dev_domain = \
 	read_conll_format(dev_files)\
@@ -157,6 +169,7 @@ def load_data(train_files, dev_files, test_files):
 	read_conll_format(test_files)
 
 	max_length = max(train_max_length, test_max_length, dev_max_length)
+	print(max_length)
 
 
 # create pos, chunk, tags str to id mapping for whole data
@@ -231,16 +244,18 @@ def create_domain_vec(sents, domains):
 	return res
 
 
-def gen_mask():
+def gen_mask(w):
 	global mask
-	src_mask = [0 for i in range(128)]
+	src_mask = [w for i in range(128)]
 	for i in range(96):
 		src_mask[i] = 1.0
-	target_mask = [0 for i in range(128)]
-	for i in range(128):
+
+	target_mask = [w for i in range(128)]
+	for i in range(64):
 		target_mask[i] = 1.0
 	for i in range(96, 128):
-		target_mask[i] = 1
+		target_mask[i] = 1.0
+
 	all_mark = [1.0 for i in range(128)]
 	mask = [src_mask, target_mask, all_mark]
 	# print(mask)
@@ -320,9 +335,9 @@ def load_embedding_matrix():
 # 	str_to_vec()
 # 	return input_train, output_train, input_test, output_test, alphabet_tag, embedd_matrix
 
-def create_data(train_files, dev_files, test_files):
-	gen_mask()
-	load_data(train_files, dev_files, test_files)
+def create_data(train_files, dev_files, test_files, w, in_domain):
+	gen_mask(w)
+	load_data(train_files, dev_files, test_files, in_domain)
 	load_embedding_matrix()
 	str_to_id()
 	str_to_vec2()

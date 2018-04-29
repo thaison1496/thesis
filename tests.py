@@ -265,7 +265,7 @@ def kinhte_no_shuffle():
 
 def thethao_no_shuffle():
 	# topics = ["Doi_song","Giao_duc","Kinh_te","The_gioi",\
-	# 	"Van_hoa","Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]
+	# 	"Van_hoa","Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]		
 	topics = ["The_thao"]
 	train_files = []
 	dev_files = []
@@ -291,18 +291,194 @@ def topic_no_shuffle(topic):
 	ner.run(train_files, dev_files, test_files, 500)
 
 
-def all_mix():
-	print("all_mix")
+def all_no_shuffle():
+	print("all_no_shuffle")
 	train_files = []
 	dev_files = []
 	test_files = []
 	topics = ["Doi_song","Giao_duc","Kinh_te","The_gioi",\
 		"Van_hoa","Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]
 	for topic in topics:
-		train_files.append("../folds/fold_1/%s.train" % topic)
-		dev_files.append("../folds/fold_1/%s.dev" % topic)
-		test_files.append("../folds/fold_1/%s.test" % topic)
+		train_files.append("../data_conll_topic/News_Train/%s.muc" % topic)
+		dev_files.append("../data_conll_topic/News_Dev/%s.muc" % topic)
+		test_files.append("../data_conll_topic/News_Test/%s.muc" % topic)
 	ner.run(train_files, dev_files, test_files, 500)
+
+
+
+def thethao_kinhte_mix_no_shuffle():
+	print("thethao_kinhte_mix")
+	train_files = ["../data_conll_topic/News_Train/Kinh_te.muc",
+		"../data_conll_topic/News_Train/The_thao.muc"]
+	dev_files = ["../data_conll_topic/News_Dev/Kinh_te.muc"]
+	test_files = ["../data_conll_topic/News_Test/Kinh_te.muc"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def thethao_kinhte_transfer_no_shuffle():
+	print("thethao_kinhte_transfer")
+	train_files = [("../data_conll_topic/News_Train/Kinh_te.muc", 1),
+		("../data_conll_topic/News_Train/The_thao.muc", 0)]
+	dev_files = [("../data_conll_topic/News_Dev/Kinh_te.muc", 1)]
+	test_files = [("../data_conll_topic/News_Test/Kinh_te.muc", 1)]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+
+def kinhte_thethao_mix_no_shuffle():
+	print("kinhte_thethao_mix_no_shuffle")
+	train_files = ["../data_conll_topic/News_Train/Kinh_te.muc",
+		"../data_conll_topic/News_Train/The_thao.muc"]
+	dev_files = ["../data_conll_topic/News_Dev/The_thao.muc"]
+	test_files = ["../data_conll_topic/News_Test/The_thao.muc"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def kinhte_thethao_transfer_no_shuffle():
+	print("kinhte_thethao_transfer_no_shuffle")
+	train_files = [("../data_conll_topic/News_Train/Kinh_te.muc", 1),
+		("../data_conll_topic/News_Train/The_thao.muc", 0)]
+	dev_files = [("../data_conll_topic/News_Dev/The_thao.muc", 1)]
+	test_files = [("../data_conll_topic/News_Test/The_thao.muc", 1)]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def kinhte_thethao_transfer_no_shuffle2():
+	print("kinhte_thethao_transfer_no_shuffle2")
+	train_files = [("../data_conll_topic/News_Train/The_thao.muc", 0),
+		("../data_conll_topic/News_Train/Kinh_te.muc", 1)]
+	dev_files = [("../data_conll_topic/News_Dev/The_thao.muc", 1)]
+	test_files = [("../data_conll_topic/News_Test/The_thao.muc", 1)]
+	ner.run(train_files, dev_files, test_files, 500)
+
+################################################################
+
+def kinhte_vanhoa_mix_no_shuffle():
+	print("kinhte_vanhoa_mix_no_shuffle")
+	train_files = ["../data_conll_topic/News_Train/Kinh_te.muc",
+		"../data_conll_topic/News_Train/Van_hoa.muc"]
+	dev_files = ["../data_conll_topic/News_Dev/Van_hoa.muc"]
+	test_files = ["../data_conll_topic/News_Test/Van_hoa.muc"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def kinhte_vanhoa_transfer_no_shuffle():
+	print("kinhte_vanhoa_transfer_no_shuffle")
+	train_files = [("../data_conll_topic/News_Train/Kinh_te.muc", 0),
+		("../data_conll_topic/News_Train/Van_hoa.muc", 1)]
+	dev_files = [("../data_conll_topic/News_Dev/Van_hoa.muc", 1)]
+	test_files = [("../data_conll_topic/News_Test/Van_hoa.muc", 1)]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+
+def vanhoa_kinhte_mix_no_shuffle():
+	train_files = ["../data_conll_topic/News_Train/Van_hoa.muc",
+		"../data_conll_topic/News_Train/Kinh_te.muc"]
+	dev_files = ["../data_conll_topic/News_Dev/Kinh_te.muc"]
+	test_files = ["../data_conll_topic/News_Test/Kinh_te.muc"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def vanhoa_kinhte_transfer_no_shuffle():
+	train_files = [("../data_conll_topic/News_Train/Van_hoa.muc", 0),
+		("../data_conll_topic/News_Train/Kinh_te.muc", 1)]
+	dev_files = [("../data_conll_topic/News_Dev/Kinh_te.muc", 1)]
+	test_files = [("../data_conll_topic/News_Test/Kinh_te.muc", 2)]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def kinhte_vanhoa_outdomain():
+	print("kinhte_vanhoa_outdomain")
+	train_files = ["../data_conll_topic/News_Train/Kinh_te.muc"]
+	dev_files = ["../data_conll_topic/News_Dev/Van_hoa.muc"]
+	test_files = ["../data_conll_topic/News_Test/Van_hoa.muc"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+def vanhoa_kinhte_outdomain():
+	print("vanhoa_kinhte_outdomain")
+	train_files = ["../data_conll_topic/News_Train/Van_hoa.muc"]
+	dev_files = ["../data_conll_topic/News_Dev/Kinh_te.muc"]
+	test_files = ["../data_conll_topic/News_Test/Kinh_te.muc"]
+	ner.run(train_files, dev_files, test_files, 500)	
+
+
+#######################################
+def thethao_xahoi_mix():
+	print("thethao_xahoi_mix")
+	train_files = ["../data_conll_topic/News_Train/The_thao.muc",
+		"../data_conll_topic/News_Train/Xa_hoi.muc"]
+	dev_files = ["../data_conll_topic/News_Dev/Xa_hoi.muc"]
+	test_files = ["../data_conll_topic/News_Test/Xa_hoi.muc"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+def thethao_xahoi_transfer():
+	print("thethao_xahoi_transfer")
+	train_files = [("../data_conll_topic/News_Train/The_thao.muc", 0),
+		("../data_conll_topic/News_Train/Xa_hoi.muc", 1)]
+	dev_files = [("../data_conll_topic/News_Dev/Xa_hoi.muc", 1)]
+	test_files = [("../data_conll_topic/News_Test/Xa_hoi.muc", 1)]
+	ner.run(train_files, dev_files, test_files, 500)
+
+def thethao_xahoi_out():
+	print("thethao_xahoi_out")
+	train_files = ["../data_conll_topic/News_Train/The_thao.muc"]
+	dev_files = ["../data_conll_topic/News_Dev/Xa_hoi.muc"]
+	test_files = ["../data_conll_topic/News_Test/Xa_hoi.muc"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+
+def xahoi_thethao_mix():
+	print("xahoi_thethao_mix")
+	train_files = ["../data_conll_topic/News_Train/Xa_hoi.muc",
+		"../data_conll_topic/News_Train/The_thao.muc"]
+	dev_files = ["../data_conll_topic/News_Dev/The_thao.muc"]
+	test_files = ["../data_conll_topic/News_Test/The_thao.muc"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+def xahoi_thethao_transfer():
+	print("xahoi_thethao_transfer")
+	train_files = [("../data_conll_topic/News_Train/Xa_hoi.muc", 0),
+		("../data_conll_topic/News_Train/The_thao.muc", 1)]
+	dev_files = [("../data_conll_topic/News_Dev/The_thao.muc", 1)]
+	test_files = [("../data_conll_topic/News_Test/The_thao.muc", 1)]
+	ner.run(train_files, dev_files, test_files, 500)
+
+def xahoi_thethao_out():
+	print("xahoi_thethao_out")
+	train_files = ["../data_conll_topic/News_Train/Xa_hoi.muc"]
+	dev_files = ["../data_conll_topic/News_Dev/The_thao.muc"]
+	test_files = ["../data_conll_topic/News_Test/The_thao.muc"]
+	ner.run(train_files, dev_files, test_files, 500)
+
+#################################################
+
+
+def kinhte_vanhoa_transfer_weigth(w):
+	print("kinhte_vanhoa_transfer_no_shuffle")
+	train_files = [("../data_conll_topic/News_Train/Kinh_te.muc", 0),
+		("../data_conll_topic/News_Train/Van_hoa.muc", 1)]
+	dev_files = [("../data_conll_topic/News_Dev/Van_hoa.muc", 1)]
+	test_files = [("../data_conll_topic/News_Test/Van_hoa.muc", 1)]
+	ner.run(train_files, dev_files, test_files, 500, weigth = w)
+
+
+
+#####################################
+
+def vanhoa_kinhte_indomain(in_domain):
+	train_files = [	"../data_conll_topic/News_Train/Kinh_te.muc"]
+	dev_files = ["../data_conll_topic/News_Dev/Kinh_te.muc"]
+	test_files = ["../data_conll_topic/News_Test/Kinh_te.muc"]
+	ner.run(train_files, dev_files, test_files, 500, in_domain=in_domain)
+
+
+def vanhoa_kinhte_transfer(in_domain):
+	train_files = [("../data_conll_topic/News_Train/Van_hoa.muc", 0),
+		("../data_conll_topic/News_Train/Kinh_te.muc", 1)]
+	dev_files = [("../data_conll_topic/News_Dev/Kinh_te.muc", 1)]
+	test_files = [("../data_conll_topic/News_Test/Kinh_te.muc", 1)]
+	ner.run(train_files, dev_files, test_files, 500, in_domain=in_domain)
 
 
 
@@ -326,4 +502,31 @@ if __name__ == "__main__":
 	# all_mix()
 	# thethao_kinhte_transfer()
 	# thethao_no_shuffle()
-	topic_no_shuffle(sys.argv[1].strip())
+	# topic_no_shuffle(sys.argv[1].strip())
+	# all_no_shuffle()
+	# thethao_kinhte_mix_no_shuffle()
+	# thethao_kinhte_transfer_no_shuffle()
+	# kinhte_thethao_mix_no_shuffle()
+	# kinhte_thethao_transfer_no_shuffle()
+	# kinhte_thethao_transfer_no_shuffle2()
+	# kinhte_vanhoa_mix_no_shuffle()
+	# kinhte_vanhoa_transfer_no_shuffle()
+	# vanhoa_kinhte_mix_no_shuffle()
+	# vanhoa_kinhte_transfer_no_shuffle()
+	# kinhte_vanhoa_outdomain()
+	# vanhoa_kinhte_outdomain()
+	# kinhte_vanhoa_transfer_no_shuffle()
+	# kinhte_vanhoa_mix_no_shuffle()
+	
+	# thethao_xahoi_out()
+	# thethao_xahoi_mix()
+	# thethao_xahoi_transfer()
+
+	# xahoi_thethao_out()
+	# xahoi_thethao_mix()
+	# xahoi_thethao_transfer()
+
+	# vanhoa_kinhte_indomain(int(sys.argv[1].strip()))
+	vanhoa_kinhte_transfer(int(sys.argv[1].strip()))
+
+	# kinhte_vanhoa_transfer_weigth(float(sys.argv[1].strip()))
