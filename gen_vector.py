@@ -57,7 +57,7 @@ def read_conll_format(input_files, in_domain=100000):
 						line[3] = 'O'
 					tags.append(line[3])
 				else:
-					if ("Kinh_te" in input_file) and (250 * in_domain + 1755 < num_sent):
+					if ("Kinh_te" in input_file) and (250 * in_domain  < num_sent):
 						print(num_sent)
 						break
 					# print(len(words))

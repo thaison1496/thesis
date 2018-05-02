@@ -18,7 +18,7 @@ def quick_tf_fix():
 	sess = tf.Session(config = config)
 
 
-def run(train_files, dev_files, test_files, max_epochs, no_val=False, name="", weigth=0.0, in_domain=10000):
+def run(train_files, dev_files, test_files, max_epochs, no_val=False, name="", weigth=0.5, in_domain=10000):
 	# quick_tf_fix()
 	num_lstm_layer = 2
 	num_hidden_node = 64

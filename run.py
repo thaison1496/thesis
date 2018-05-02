@@ -12,7 +12,7 @@ import subprocess
 # 	subprocess.check_output(cmd, shell=True)
 
 
-for in_domain in range(2, 5):
-	cmd = "python tests.py %d | tee ../log/kinhte_transfer.%d" % (in_domain, in_domain * 250)
+for in_domain in range(5, 6):
+	cmd = "python tests.py %d | tee ../log/kinhte_indomain.%d" % (in_domain, in_domain * 250)
 	print(cmd)
 	subprocess.check_output(cmd, shell=True)
