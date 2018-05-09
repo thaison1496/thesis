@@ -526,7 +526,9 @@ if __name__ == "__main__":
 	# xahoi_thethao_mix()
 	# xahoi_thethao_transfer()
 
-	vanhoa_kinhte_indomain(int(sys.argv[1].strip()))
+	# vanhoa_kinhte_indomain(int(sys.argv[1].strip()))
 	# vanhoa_kinhte_transfer(int(sys.argv[1].strip()))
 
 	# kinhte_vanhoa_transfer_weigth(float(sys.argv[1].strip()))
+
+	vanhoa_kinhte_transfer()
