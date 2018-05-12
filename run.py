@@ -1,7 +1,7 @@
 import subprocess
 
-# topics = ["Doi_song","Giao_duc","Kinh_te","The_gioi",\
-# 		"Van_hoa","Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]
+topics = ["Doi_song","Giao_duc", "The_gioi",\
+		"Giai_tri","KH-CN","Phap_luat","The_thao","Xa_hoi"]
 
 # topics = ["KH-CN","Phap_luat","The_thao","Xa_hoi"]
 
@@ -12,7 +12,8 @@ import subprocess
 # 	subprocess.check_output(cmd, shell=True)
 
 
-for in_domain in range(5, 6):
-	cmd = "python tests.py %d | tee ../log/kinhte_indomain.%d" % (in_domain, in_domain * 250)
+for src in topics:
+	# cmd = "python tests.py %s | tee ../log/%s_kinhte_mixin" % (src, src)
+	cmd = "python tests.py %s | tee ../log/%s_kinhte_w_0.3" % (src, src)
 	print(cmd)
 	subprocess.check_output(cmd, shell=True)

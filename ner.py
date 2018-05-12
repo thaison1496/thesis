@@ -18,7 +18,7 @@ def quick_tf_fix():
 	sess = tf.Session(config = config)
 
 
-def run(train_files, dev_files, test_files, max_epochs, no_val=False, name="", weigth=0.5, in_domain=10000):
+def run(train_files, dev_files, test_files, max_epochs, no_val=False, name="", weigth=0.5):
 	# quick_tf_fix()
 	num_lstm_layer = 2
 	num_hidden_node = 64
@@ -33,7 +33,7 @@ def run(train_files, dev_files, test_files, max_epochs, no_val=False, name="", w
 	input_test, input_test_add, output_train, output_dev, output_test, \
 	alphabet_tag, embedd_matrix, \
 	train_domain, dev_domain, test_domain \
-	= gen_vector.create_data(train_files, dev_files, test_files, weigth, in_domain)
+	= gen_vector.create_data(train_files, dev_files, test_files, weigth)
 
 	# print(train_domain.shape)
 	# print(train_domain[0][0])

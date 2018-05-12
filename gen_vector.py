@@ -20,9 +20,7 @@ def map_number_and_punct(word):
 # 1 target
 # 2 all
 
-# train kinhte: 1535
-# train vanhoa: 1755
-def read_conll_format(input_files, in_domain=100000):
+def read_conll_format(input_files):
 	# print(in_domain)
 	word_list = []
 	chunk_list = []
@@ -57,11 +55,6 @@ def read_conll_format(input_files, in_domain=100000):
 						line[3] = 'O'
 					tags.append(line[3])
 				else:
-					if ("Kinh_te" in input_file) and (250 * in_domain  < num_sent):
-						print(num_sent)
-						break
-					# print(len(words))
-					# print(words)
 					domain_list.append(domain)
 					word_list.append(words)
 					pos_list.append(poss)
@@ -74,7 +67,6 @@ def read_conll_format(input_files, in_domain=100000):
 					tags = []
 					num_sent += 1
 					max_length = max(max_length, sent_length)
-
 	return word_list, pos_list, chunk_list, tag_list, num_sent, max_length, domain_list
 
 
@@ -147,12 +139,8 @@ def load_embedding():
 	embedd_dim = np.shape(embedd_vectors)[1]
 	unknown_embedd = np.random.uniform(-0.01, 0.01, [1, embedd_dim])
 
-	# print(embedd_words[:10])
-	# print(embedd_vectors[:10])
 
-
-
-def load_data(train_files, dev_files, test_files, in_domain):
+def load_data(train_files, dev_files, test_files):
 	global train_domain, dev_domain, test_domain
 	global train_word, train_pos, train_chunk, train_tag, train_num_sent, train_max_length
 	global dev_word, dev_pos, dev_chunk, dev_tag, dev_num_sent, dev_max_length
@@ -160,7 +148,7 @@ def load_data(train_files, dev_files, test_files, in_domain):
 	global max_length
 
 	train_word, train_pos, train_chunk, train_tag, train_num_sent, train_max_length, train_domain = \
-	read_conll_format(train_files, in_domain)
+	read_conll_format(train_files)
 
 	dev_word, dev_pos, dev_chunk, dev_tag, dev_num_sent, dev_max_length, dev_domain = \
 	read_conll_format(dev_files)\
@@ -170,6 +158,7 @@ def load_data(train_files, dev_files, test_files, in_domain):
 
 	max_length = max(train_max_length, test_max_length, dev_max_length)
 	print(max_length)
+
 
 
 # create pos, chunk, tags str to id mapping for whole data
@@ -258,7 +247,7 @@ def gen_mask(w):
 
 	all_mark = [1.0 for i in range(128)]
 	mask = [src_mask, target_mask, all_mark]
-	# print(mask)
+	print(mask)
 
 
 def str_to_vec2():
@@ -335,9 +324,9 @@ def load_embedding_matrix():
 # 	str_to_vec()
 # 	return input_train, output_train, input_test, output_test, alphabet_tag, embedd_matrix
 
-def create_data(train_files, dev_files, test_files, w, in_domain):
+def create_data(train_files, dev_files, test_files, w):
 	gen_mask(w)
-	load_data(train_files, dev_files, test_files, in_domain)
+	load_data(train_files, dev_files, test_files)
 	load_embedding_matrix()
 	str_to_id()
 	str_to_vec2()
